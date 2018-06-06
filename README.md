@@ -19,7 +19,7 @@ Learn Ruby course is one of Codecademy courses. summarized this course's content
     - 모든 것이 객체
 
 - 주석
-    - # comment
+    - ```# comment```
     - =begin
         - comment
     - =end
