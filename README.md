@@ -1,7 +1,7 @@
 # codecademy-learn-ruby
 Learn Ruby course is one of Codecademy courses. summarized this course's content.
 
-- 데이터 타입
+- 데이터 타입 
         - number, boolean, string
       - 변수
         - my_num = 25
