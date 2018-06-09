@@ -351,14 +351,22 @@ Learn Ruby course is one of Codecademy courses. summarized this course's content
     - end
     - require ('my_library) # 다른 파일에서 모듈 불러오기
     - puts MyLibrary::FAVE_BOOK
-    - class Angle
-        - include Math # 인스턴스 레벨 믹스인
-        - def cosine(radius)
-            - cos(radius)
+    - module PrintableName
+        - def print_name
+            - puts @name 
 
         - end
 
     - end
+    - class Person
+        - include PrintableName # 인스턴스 레벨 믹스인
+        - def initialize(name)
+            - @name = name
+
+        - end
+
+    - end
+    - Person.new('bsscco').print_name
     - module ThePresent
         - def now
             - Time.new
