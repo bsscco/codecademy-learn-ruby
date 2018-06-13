@@ -1,6 +1,4 @@
 # codecademy-learn-ruby
-Learn Ruby course is one of Codecademy courses. Summarized Ruby grammars of this course.
-
 
 - 데이터 타입
     - number, boolean, string
