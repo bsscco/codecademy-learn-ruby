@@ -50,3 +50,7 @@
     - 객체 비교
         - R : &lt;=&gt; 연산자 사용. 단, &lt;=&gt; 메소드를 오버라이딩 해야 정상 동작
         - K : == 연산자 사용. 단, equals를 오버라이딩 해야 정상 동작
+
+    - 맵을 표현할 때
+        - R : key =&gt; value 또는 key: value
+        - K : key to value
