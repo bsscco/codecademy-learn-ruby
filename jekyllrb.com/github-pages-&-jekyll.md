@@ -136,11 +136,11 @@ https://jekyllrb.com/docs/step-by-step/01-setup/
             - Jill is an avid fruit grower based in the south of France.
 
         - _authors/ted.html
-            - ---
+            - ```---```
             - short_name: ted
             - name: Ted Doe
             - position: Writer
-            - ---
+            - ```---```
             - Ted has been eating fruit since he was baby.
 
         - output: true
