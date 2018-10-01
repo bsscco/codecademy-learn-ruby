@@ -83,10 +83,10 @@ https://jekyllrb.com/docs/step-by-step/01-setup/
         - _posts/2018-08-20-bananas.md
         - 포스트 리스팅
             - blog.html
-                - ---
+                - ```---```
                 - layout: default
                 - title: Blog
-                - ---
+                - ```---```
                 - &lt;h1&gt;Latest Posts&lt;/h1&gt;
                 - &lt;ul&gt;
                     - {% for post in site.posts %}
@@ -110,9 +110,9 @@ https://jekyllrb.com/docs/step-by-step/01-setup/
             -     output: true
 
         - staff.html
-            - ---
+            - ```---```
             - layout: default
-            - ---
+            - ```---```
             - &lt;h1&gt;Staff&lt;/h1&gt;
             - &lt;ul&gt;
                 - {% for author in site.authors %}
@@ -128,11 +128,11 @@ https://jekyllrb.com/docs/step-by-step/01-setup/
             - &lt;/ul&gt;
 
         - _authors/jill.md
-            - ---
+            - ```---```
             - short_name: jill
             - name: Jill Smith
             - position: Chief Editor
-            - ---
+            - ```---```
             - Jill is an avid fruit grower based in the south of France.
 
         - _authors/ted.html
