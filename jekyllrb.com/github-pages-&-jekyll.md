@@ -35,10 +35,10 @@ https://jekyllrb.com/docs/step-by-step/01-setup/
             - {{ content }} 로 내용을 채운다.
 
         - about.html
-            - ---
+            - ```---```
             - layout: default
             - title: About
-            - ---
+            - ```---```
 
     - 5. Includes
         - 레이아웃에 다른 레이아웃을 삽입해서 재사용성을 높일 수 있다.
