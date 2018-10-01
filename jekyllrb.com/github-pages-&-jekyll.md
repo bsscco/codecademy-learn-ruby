@@ -23,8 +23,8 @@ https://jekyllrb.com/docs/step-by-step/01-setup/
             - Object 출력을 가공한다.
 
     - 3. Front Matter
-        - ---  
----
+        - ```---```
+        - ```---```
         - 파일 첫부분에 적는 내용
         - Object로 사용된다.
 
