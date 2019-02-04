@@ -26,4 +26,6 @@ KotlinAnatomic
   - setOf(1,2) - setOf(1) // setOf(2)
   - s.toSet().size == s.toList().size // is 's' unique
   - map['key'] = value
-  - 
+  - intArrayOf()
+  - list.sorted().distinct().takeLast(5)
+  - s.repeat(5)
