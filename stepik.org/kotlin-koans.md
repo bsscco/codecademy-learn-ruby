@@ -1,88 +1,549 @@
 Kotlin koans
 
--   introduction
-    -   simple function\
-        fun start(): String = "OK"
-    -   named argument\
-        options.joinToString(prefix = "[", postfix = "]")
-    -   default argument\
-        fun foo(name: String, number: Int = 42, toUpperCase: Boolean = false) = ...
-    -   lambda\
-        fun containsEven(collection: Collection<Int>): Boolean = collection.any { it -> it % 2 == 0 }
-    -   raw string & string template\
-        fun getPattern(): String = """\d{2} ${month} \d{4}"""
-    -   data class\
-        data class Person(val name: String, val age: Int)
-    -   nullable type\
-        fun sendMessageToClient(client: Client?, message: String?, mailer: Mailer){ if (client == null || message == null) return val personalInfo = client.personalInfo ?: return val email = personalInfo!!.email ?: return
-    -   smart cast & when expression\
-        fun eval(expr: Expr): Int = when (expr) { is Num -> expr.value is Sum -> eval(expr.left) + eval(expr.right) else -> throw IllegalArgumentException("Unknown expression") }
-    -   extension function\
-        fun Int.r(): RationalNumber = RationalNumber(this, 1)
-    -   object expression\
-        Collections.sort(arrayList, object : Comparator<Int> { override fun compare(x: Int, y: Int) = y - x })
-    -   SAM conversion\
-        Collections.sort(arrayList, { x, y -> y - x })
-    -   extension function on collections\
-        return arrayListOf(1, 5, 2).sortedDescending()
--   conventions
-    -   comparison\
-        data class MyDate(val year: Int, val month: Int, val dayOfMonth: Int) : Comparable<MyDate> { override fun compareTo(other: MyDate) = when { year != other.year -> year - other.year month != other.month -> month - other.month else -> dayOfMonth - other.dayOfMonth } } fun compare(date1: MyDate, date2: MyDate) = date1 < date2
-    -   in range\
-        class DateRange(val start: MyDate, val endInclusive: MyDate) { operator fun contains(d: MyDate) = start <= d && d < endInclusive } fun checkInRange(date: MyDate, first: MyDate, last: MyDate): Boolean { return date in DateRange(first, last) }
-    -   range to\
-        operator fun MyDate.rangeTo(other: MyDate) = DateRange(this, other) class DateRange(override val start: MyDate, override val endInclusive: MyDate): ClosedRange<MyDate> fun checkInRange(date: MyDate, first: MyDate, last: MyDate): Boolean { return date in first..last }
-    -   for loop\
-        class DateRange(val start: MyDate, val end: MyDate) : Iterable<MyDate> { override fun iterator(): Iterator<MyDate> { return object : Iterator<MyDate> { var currentDate: MyDate = start; override fun hasNext(): Boolean { return currentDate <= end } override fun next(): MyDate { val result = currentDate currentDate = currentDate.nextDay() return result } } } } fun iterateOverDateRange(firstDate: MyDate, secondDate: MyDate, handler: (MyDate) -> Unit) { for (date in firstDate..secondDate) { handler(date) } }
-    -   operator overloading\
-        data class MyDate(val year: Int, val month: Int, val dayOfMonth: Int) enum class TimeInterval { DAY, WEEK, YEAR } operator fun MyDate.plus(timeInterval: TimeInterval): MyDate = addTimeIntervals(timeInterval, 1) class RepeatedTimeInterval(val timeInterval: TimeInterval, val number: Int) operator fun TimeInterval.times(number: Int) = RepeatedTimeInterval(this, number) operator fun MyDate.plus(repeatedTimeInterval: RepeatedTimeInterval) : MyDate = addTimeIntervals(repeatedTimeInterval.timeInterval, repeatedTimeInterval.number) fun task1(today: MyDate): MyDate { return today + YEAR + WEEK } fun task2(today: MyDate): MyDate { return today + YEAR * 2 + WEEK * 3 + DAY * 5 }
-    -   destructoring declaration\
-        data class MyDate(val year: Int, val month: Int, val dayOfMonth: Int) fun isLeapDay(date: MyDate): Boolean { val (year, month, dayOfMonth) = date }
-    -   invoke\
-        class Invokable { var numberOfInvocations: Int = 0 private set operator fun invoke(): Invokable { numberOfInvocations++ return this } } fun invokeTwice(invokable: Invokable) = invokable()()
--   collections
-    -   collection extension function\
-        fun Shop.getSetOfCustomers(): Set<Customer> = customers.toSet()
-    -   filter & map\
-        fun Shop.getCitiesCustomersAreFrom(): Set<City> = customers.map { it.city }.toSet() fun Shop.getCustomersFrom(city: City): List<Customer> = customers.filter { it.city == city }
-    -   any, all, and other predicates\
-        fun Shop.checkAllCustomersAreFrom(city: City): Boolean = customers.all { it.city == city } fun Shop.hasCustomerFrom(city: City): Boolean = customers.any { it.city == city } fun Shop.countCustomersFrom(city: City): Int = customers.count { it.city == city } fun Shop.findAnyCustomerFrom(city: City): Customer? = customers.find { it.city == city }
-    -   flatmap\
-        fun Customer.getOrderedProducts(): Set<Product> = orders.flatMap { it.products }.toSet() fun Shop.getAllOrderedProducts(): Set<Product> = customers.flatMap { it.orders.flatMap { it.products } }.toSet()
-    -   max & min\
-        fun Shop.getCustomerWithMaximumNumberOfOrders(): Customer? = customers.maxBy { it.orders.size } fun Customer.getMostExpensiveOrderedProduct(): Product? = orders.flatMap { it.products }.maxBy { it.price }
-    -   sort\
-        fun Shop.getCustomersSortedByNumberOfOrders(): List<Customer> = customers.sortedBy { it.orders.size }
-    -   sum\
-        fun Customer.getTotalOrderPrice(): Double = orders.flatMap { it.products }.sumByDouble { it.price }
-    -   group by\
-        fun Shop.groupCustomersByCity(): Map<City, List<Customer>> = customers.groupBy { it.city }
-    -   partition\
-        fun Shop.getCustomersWithMoreUndeliveredOrdersThanDelivered(): Set<Customer> = customers.filter { val (delivered, undelivered) = it.orders.partition { it.isDelivered } undelivered.size > delivered.size }.toSet()
-    -   fold\
-        fun Shop.getSetOfProductsOrderedByEveryCustomer(): Set<Product> { val allProducts = customers.flatMap { it.orders.flatMap { it.products } }.toSet() return customers.fold(allProducts) { orderedByAll, customer -> orderedByAll.intersect(customer.orders.flatMap { it.products }.toSet()) } }
-    -   compound collection functions\
-        fun Customer.getMostExpensiveDeliveredProduct(): Product? = orders.filter { it.isDelivered }.flatMap { it.products }.maxBy { it.price } fun Shop.getNumberOfTimesProductWasOrdered(product: Product): Int = customers.flatMap { it.orders.flatMap { it.products } }.count { it.name == product.name }
-    -   compound collection functions2\
-        fun doSomethingStrangeWithCollection(collection: Collection<String>): Collection<String>? { val groupsByLength = collection. groupBy { s -> s.length } val maximumSizeOfGroup = groupsByLength.values.map { group -> group.size }.max() return groupsByLength.values.firstOrNull { group -> group.size == maximumSizeOfGroup } }
--   properties
-    -   property\
-        class PropertyExample() { var counter = 0 var propertyWithCounter: Int? = null set(p : Int?) { field = p counter++ } }
-    -   lazy property\
-        class LazyProperty(val initializer: () -> Int) { var value : Int? = null val lazy: Int get() { if(value == null) { value = initializer() } return value!! } }
-    -   lazy delegate\
-        class LazyProperty(val initializer: () -> Int) { val lazyValue: Int by lazy(initializer) }
-    -   delegate how it works\
-        class D { var date: MyDate by EffectiveDate() } class EffectiveDate<R> : ReadWriteProperty<R, MyDate> { var timeInMillis: Long? = null override fun getValue(thisRef: R, property: KProperty<*>): MyDate { return timeInMillis!!.toDate() } override fun setValue(thisRef: R, property: KProperty<*>, value: MyDate) { timeInMillis = value.toMillis() } }
--   builders
-    -   extension function literal\
-        fun task(): List<Boolean> { val isEven: Int.() -> Boolean = { this % 2 == 0 } val isOdd: Int.() -> Boolean = { this % 2 != 0 } return listOf(42.isOdd(), 239.isOdd(), 294823098.isEven()) }
-    -   map builder\
-        fun <K, V> buildMap(build: HashMap<K, V>.() -> Unit): Map<K, V> { val map = HashMap<K, V>() map.build() return map } fun usage(): Map<Int, String> { return buildMap { put(0, "0") for (i in 1..10) { put(i, "$i") } } }
-    -   function apply\
-        fun <T> T.myApply(f: T.() -> Unit): T { f(); return this } fun createString(): String { return StringBuilder().myApply { append("Numbers: ") for (i in 1..10) { append(i) } }.toString() }
-    -   html builder\
-        fun renderProductTable(): String { return html { table { tr(getTitleColor()) { td { text("Product") } td { text("Price") } td { text("Popularity") } } val products = getProducts() for ((index, product) in products.withIndex()) { tr { td (color = getCellColor(index, 0)) { text(product.description) } td (color = getCellColor(index, 1)) { text(product.price) } td (color = getCellColor(index, 2)) { text(product.popularity) } } } } }.toString() }
--   generics
-    -   generic function\
-        fun <T, C : MutableCollection<T>> Collection<T>.partitionTo(first: C, second: C, predicate: (T) -> Boolean): Pair<C, C> { for (el in this) { if (predicate(el)) { first.add(el) } else { second.add(el) } } return Pair(first, second) } fun partitionWordsAndLines() { val (words, lines) = listOf("a", "a b", "c", "d e").partitionTo(ArrayList<String>(), ArrayList()) { s -> !s.contains(" ") } words == listOf("a", "c") lines == listOf("a b", "d e") } fun partitionLettersAndOtherSymbols() { val (letters, other) = setOf('a', '%', 'r', '}').partitionTo(HashSet<Char>(), HashSet()) { c -> c in 'a'..'z' || c in 'A'..'Z' } letters == setOf('a', 'r') other == setOf('%', '}') }
+- introduction
+
+  - simple function
+
+    "fun start(): String = "OK""
+
+  - named argument
+
+    "options.joinToString(prefix = "[", postfix = "]")"
+
+  - default argument
+
+    "fun foo(name: String, number: Int = 42, toUpperCase: Boolean = false) = ..."
+
+  - lambda
+
+    "fun containsEven(collection: Collection<Int>): Boolean = collection.any { it -> it % 2 == 0 }"
+
+  - raw string & string template
+
+    "fun getPattern(): String = """\d{2} ${month} \d{4}""""
+
+  - data class
+
+    "data class Person(val name: String, val age: Int)"
+
+  - nullable type
+
+    "fun sendMessageToClient(client: Client?, message: String?, mailer: Mailer){
+
+        if (client == null || message == null) return
+
+        val personalInfo = client.personalInfo ?: return
+
+        val email = personalInfo!!.email ?: return"
+
+  - smart cast & when expression
+
+    "fun eval(expr: Expr): Int =
+
+            when (expr) {
+
+                is Num -> expr.value
+
+                is Sum -> eval(expr.left) + eval(expr.right)
+
+                else -> throw IllegalArgumentException("Unknown expression")
+
+            }"
+
+  - extension function
+
+    "fun Int.r(): RationalNumber = RationalNumber(this, 1)"
+
+  - object expression
+
+    "Collections.sort(arrayList, object : Comparator<Int> {
+
+        override fun compare(x: Int, y: Int) = y - x
+
+    })"
+
+  - SAM conversion
+
+    "Collections.sort(arrayList, { x, y -> y - x })"
+
+  - extension function on collections
+
+    "return arrayListOf(1, 5, 2).sortedDescending()"
+
+- conventions
+
+  - comparison
+
+    "data class MyDate(val year: Int, val month: Int, val dayOfMonth: Int) : Comparable<MyDate> {
+
+        override fun compareTo(other: MyDate) = when {
+
+            year != other.year -> year - other.year
+
+            month != other.month -> month - other.month
+
+            else -> dayOfMonth - other.dayOfMonth
+
+        }
+
+    }
+
+    fun compare(date1: MyDate, date2: MyDate) = date1 < date2"
+
+  - in range
+
+    "class DateRange(val start: MyDate, val endInclusive: MyDate) {
+
+        operator fun contains(d: MyDate) = start <= d && d < endInclusive
+
+    }
+
+    fun checkInRange(date: MyDate, first: MyDate, last: MyDate): Boolean {
+
+        return date in DateRange(first, last)
+
+    }"
+
+  - range to
+
+    "operator fun MyDate.rangeTo(other: MyDate) = DateRange(this, other)
+
+    class DateRange(override val start: MyDate, override val endInclusive: MyDate): ClosedRange<MyDate>
+
+    fun checkInRange(date: MyDate, first: MyDate, last: MyDate): Boolean {
+
+        return date in first..last
+
+    }"
+
+  - for loop 
+
+    "class DateRange(val start: MyDate, val end: MyDate) : Iterable<MyDate> {
+
+        override fun iterator(): Iterator<MyDate> {
+
+            return object : Iterator<MyDate> {
+
+                var currentDate: MyDate = start;
+
+                override fun hasNext(): Boolean {
+
+                    return currentDate <= end
+
+                }
+
+                override fun next(): MyDate {
+
+                    val result = currentDate
+
+                    currentDate = currentDate.nextDay()
+
+                    return result
+
+                }
+
+            }
+
+        }
+
+    }
+
+    fun iterateOverDateRange(firstDate: MyDate, secondDate: MyDate, handler: (MyDate) -> Unit) {
+
+        for (date in firstDate..secondDate) {
+
+            handler(date)
+
+        }
+
+    }"
+
+  - operator overloading
+
+    "data class MyDate(val year: Int, val month: Int, val dayOfMonth: Int)
+
+    enum class TimeInterval { DAY, WEEK, YEAR }
+
+    operator fun MyDate.plus(timeInterval: TimeInterval): MyDate = addTimeIntervals(timeInterval, 1)
+
+    class RepeatedTimeInterval(val timeInterval: TimeInterval, val number: Int)
+
+    operator fun TimeInterval.times(number: Int) = RepeatedTimeInterval(this, number)
+
+    operator fun MyDate.plus(repeatedTimeInterval: RepeatedTimeInterval) : MyDate = addTimeIntervals(repeatedTimeInterval.timeInterval, repeatedTimeInterval.number)
+
+    fun task1(today: MyDate): MyDate {
+
+        return today + YEAR + WEEK
+
+    }
+
+    fun task2(today: MyDate): MyDate {
+
+        return today + YEAR * 2 + WEEK * 3 + DAY * 5
+
+    }"
+
+  - destructoring declaration
+
+    "data class MyDate(val year: Int, val month: Int, val dayOfMonth: Int)
+
+    fun isLeapDay(date: MyDate): Boolean {
+
+        val (year, month, dayOfMonth) = date
+
+    }"
+
+  - invoke
+
+    "class Invokable {
+
+        var numberOfInvocations: Int = 0
+
+            private set
+
+        operator fun invoke(): Invokable {
+
+            numberOfInvocations++
+
+            return this
+
+        }
+
+    }
+
+    fun invokeTwice(invokable: Invokable) = invokable()()"
+
+- collections
+
+  - collection extension function
+
+    "fun Shop.getSetOfCustomers(): Set<Customer> = customers.toSet()"
+
+  - filter & map
+
+    "fun Shop.getCitiesCustomersAreFrom(): Set<City> = customers.map { it.city }.toSet()
+
+    fun Shop.getCustomersFrom(city: City): List<Customer> = customers.filter { it.city == city }"
+
+  - any, all, and other predicates
+
+    "fun Shop.checkAllCustomersAreFrom(city: City): Boolean = customers.all { it.city == city }
+
+    fun Shop.hasCustomerFrom(city: City): Boolean = customers.any { it.city == city }
+
+    fun Shop.countCustomersFrom(city: City): Int = customers.count { it.city == city }
+
+    fun Shop.findAnyCustomerFrom(city: City): Customer? = customers.find { it.city == city }"
+
+  - flatmap
+
+    "fun Customer.getOrderedProducts(): Set<Product> = orders.flatMap { it.products }.toSet()
+
+    fun Shop.getAllOrderedProducts(): Set<Product> = customers.flatMap { it.orders.flatMap { it.products } }.toSet()"
+
+  - max & min
+
+    "fun Shop.getCustomerWithMaximumNumberOfOrders(): Customer? = customers.maxBy { it.orders.size }
+
+    fun Customer.getMostExpensiveOrderedProduct(): Product? = orders.flatMap { it.products }.maxBy { it.price }"
+
+  - sort
+
+    "fun Shop.getCustomersSortedByNumberOfOrders(): List<Customer> = customers.sortedBy { it.orders.size }"
+
+  - sum
+
+    "fun Customer.getTotalOrderPrice(): Double = orders.flatMap { it.products }.sumByDouble { it.price }"
+
+  - group by
+
+    "fun Shop.groupCustomersByCity(): Map<City, List<Customer>> = customers.groupBy { it.city }"
+
+  - partition
+
+    "fun Shop.getCustomersWithMoreUndeliveredOrdersThanDelivered(): Set<Customer> = customers.filter {
+
+        val (delivered, undelivered) = it.orders.partition { it.isDelivered }
+
+        undelivered.size > delivered.size
+
+    }.toSet()"
+
+  - fold
+
+    "fun Shop.getSetOfProductsOrderedByEveryCustomer(): Set<Product> {
+
+        val allProducts = customers.flatMap { it.orders.flatMap { it.products } }.toSet()
+
+        return customers.fold(allProducts) { orderedByAll, customer -> orderedByAll.intersect(customer.orders.flatMap { it.products }.toSet()) }
+
+    }"
+
+  - compound collection functions
+
+    "fun Customer.getMostExpensiveDeliveredProduct(): Product? = orders.filter { it.isDelivered }.flatMap { it.products }.maxBy { it.price }
+
+    fun Shop.getNumberOfTimesProductWasOrdered(product: Product): Int = customers.flatMap { it.orders.flatMap { it.products } }.count { it.name == product.name }"
+
+  - compound collection functions2
+
+    "fun doSomethingStrangeWithCollection(collection: Collection<String>): Collection<String>? {
+
+        val groupsByLength = collection. groupBy { s -> s.length }
+
+        val maximumSizeOfGroup = groupsByLength.values.map { group -> group.size }.max()
+
+        return groupsByLength.values.firstOrNull { group -> group.size == maximumSizeOfGroup }
+
+    }"
+
+- properties
+
+  - property
+
+    "class PropertyExample() {
+
+        var counter = 0
+
+        var propertyWithCounter: Int? = null
+
+            set(p : Int?) {
+
+                field = p
+
+                counter++
+
+            }
+
+    }"
+
+  - lazy property
+
+    "class LazyProperty(val initializer: () -> Int) {
+
+        var value :  Int? = null
+
+        val lazy: Int
+
+            get() {
+
+                if(value == null) {
+
+                    value = initializer()
+
+                }
+
+                return value!!
+
+            }
+
+    }"
+
+  - lazy delegate
+
+    "class LazyProperty(val initializer: () -> Int) {
+
+        val lazyValue: Int by lazy(initializer)
+
+    }"
+
+  - delegate how it works
+
+    "class D {
+
+        var date: MyDate by EffectiveDate()
+
+    }
+
+    class EffectiveDate<R> : ReadWriteProperty<R, MyDate> {
+
+        var timeInMillis: Long? = null
+
+        override fun getValue(thisRef: R, property: KProperty<*>): MyDate {
+
+            return timeInMillis!!.toDate()
+
+        }
+
+        override fun setValue(thisRef: R, property: KProperty<*>, value: MyDate) {
+
+            timeInMillis = value.toMillis()
+
+        }
+
+    }"
+
+- builders
+
+  - extension function literal
+
+    "fun task(): List<Boolean> {
+
+        val isEven: Int.() -> Boolean = { this % 2 == 0 }
+
+        val isOdd: Int.() -> Boolean = { this % 2 != 0 }
+
+        return listOf(42.isOdd(), 239.isOdd(), 294823098.isEven())
+
+    }"
+
+  - map builder
+
+    "fun <K, V> buildMap(build: HashMap<K, V>.() -> Unit): Map<K, V> {
+
+        val map = HashMap<K, V>()
+
+        map.build()
+
+        return map
+
+    }
+
+    fun usage(): Map<Int, String> {
+
+        return buildMap {
+
+            put(0, "0")
+
+            for (i in 1..10) {
+
+                put(i, "$i")
+
+            }
+
+        }
+
+    }"
+
+  - function apply
+
+    "fun <T> T.myApply(f: T.() -> Unit): T {
+
+        f(); return this
+
+    }
+
+    fun createString(): String {
+
+        return StringBuilder().myApply {
+
+            append("Numbers: ")
+
+            for (i in 1..10) {
+
+                append(i)
+
+            }
+
+        }.toString()
+
+    }"
+
+  - html builder
+
+    "fun renderProductTable(): String {
+
+        return html {
+
+            table {
+
+                tr(getTitleColor()) {
+
+                    td {
+
+                        text("Product")
+
+                    }
+
+                    td {
+
+                        text("Price")
+
+                    }
+
+                    td {
+
+                        text("Popularity")
+
+                    }
+
+                }
+
+                val products = getProducts()
+
+                for ((index, product) in products.withIndex()) {
+
+                    tr {
+
+                        td (color = getCellColor(index, 0)) {
+
+                            text(product.description)
+
+                        }
+
+                        td (color = getCellColor(index, 1)) {
+
+                            text(product.price)
+
+                        }
+
+                        td (color = getCellColor(index, 2)) {
+
+                            text(product.popularity)
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }.toString()
+
+    }"
+
+- generics
+
+  - generic function
+
+    "fun <T, C : MutableCollection<T>> Collection<T>.partitionTo(first: C, second: C, predicate: (T) -> Boolean): Pair<C, C> {
+
+        for (el in this) {
+
+            if (predicate(el)) {
+
+                first.add(el)
+
+            } else {
+
+                second.add(el)
+
+            }
+
+        }
+
+        return Pair(first, second)
+
+    }
+
+    fun partitionWordsAndLines() {
+
+        val (words, lines) = listOf("a", "a b", "c", "d e").partitionTo(ArrayList<String>(), ArrayList()) { s -> !s.contains(" ") }
+
+        words == listOf("a", "c")
+
+        lines == listOf("a b", "d e")
+
+    }
+
+    fun partitionLettersAndOtherSymbols() {
+
+        val (letters, other) = setOf('a', '%', 'r', '}').partitionTo(HashSet<Char>(), HashSet()) { c -> c in 'a'..'z' || c in 'A'..'Z' }
+
+        letters == setOf('a', 'r')
+
+        other == setOf('%', '}')
+
+    }"
