@@ -1,0 +1,29 @@
+KotlinAnatomic
+
+- Programming Basics
+  - val vs var
+  - if expression
+  - string template
+  - navigate last edit location : ⌘←
+  - range
+    - 0..10 step 2
+    - 0 until 10
+    - 10 down to 0
+  - inter live template : iter ⇥
+  - in keyword
+- Introduction to Objects
+  - s.reversed()
+  - IntRage()
+  - creating class
+  - extract property : ⌥⌘f
+  - extend selection : ⌥↑
+  - package & import
+  - repeat(n)
+  - listOf(), mutableListOf()
+  - s.toList().sorted().toString()
+  - list.chunked(), list.flatten()
+  - setOf(), mutableSetOf()
+  - setOf(1,2) - setOf(1) // setOf(2)
+  - s.toSet().size == s.toList().size // is 's' unique
+  - map['key'] = value
+  - 
